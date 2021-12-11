@@ -1,0 +1,15 @@
+{
+  "name": "jstreap",
+  "version": "1.0.0",
+  "description": "Treap implementations of common data structures",
+  "main": "treap.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "Dillon Morse",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^3.10.0",
+    "jsverify": "^0.8.4"
+  }
+}

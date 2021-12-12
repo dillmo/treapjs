@@ -2,6 +2,8 @@ const jsc = require("jsverify");
 
 const { Treap } = require("../treap");
 
+const dedupArr = (arr) => arr.filter((elem, idx) => arr.indexOf(elem) === idx);
+
 describe("Treap", () => {
   jsc.property(
     "contains(x) returns true for numbers added to the treap",
@@ -37,8 +39,8 @@ describe("Treap", () => {
       const treap = new Treap(prng);
 
       for (let i = 0; i < values.length; ++i) {
-        const subArray = values.slice(0, i);
-        for (const value of values.filter((v) => !subArray.includes(v))) {
+        const notAdded = values.filter((v) => !values.includes(v));
+        for (const value of notAdded) {
           if (treap.contains(value)) {
             return false;
           }
@@ -83,7 +85,7 @@ describe("Treap", () => {
 
       for (let i = 0; i < values.length; ++i) {
         treap.add(values[i]);
-        const sorted = values.slice(0, i + 1).sort((a, b) => a - b);
+        const sorted = dedupArr(values.slice(0, i + 1)).sort((a, b) => a - b);
         for (let j = 0; j < sorted.length; ++j) {
           if (treap.nth(j) !== sorted[j]) {
             return false;

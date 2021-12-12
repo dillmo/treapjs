@@ -22,6 +22,10 @@ class Treap {
   }
 
   add(data) {
+    if (this.contains(data)) {
+      return;
+    }
+
     const node = new TreapNode(data, this._prng.next().value);
     const parent = this._findParentLeaf(data);
 
@@ -86,13 +90,6 @@ class Treap {
       }
       if (node2 === node) {
         return { parent, grandparent };
-      }
-      if (node.data === node2.data) {
-        /* because of rotations, we don't know which side node is on */
-        return (
-          __findFamily(node2.left, node2, parent) ??
-          __findFamily(node2.right, node2, parent)
-        );
       }
       if (node.data < node2.data) {
         return __findFamily(node2.left, node2, parent);

@@ -9,7 +9,7 @@
   "author": "Dillon Morse",
   "license": "ISC",
   "devDependencies": {
-    "jasmine": "^3.10.0",
-    "jsverify": "^0.8.4"
+    "fast-check": "^2.20.0",
+    "jasmine": "^3.10.0"
   }
 }

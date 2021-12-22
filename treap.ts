@@ -1,35 +1,72 @@
-const unique = <T>(xs: T[]) => xs.filter((x, idx) => xs.indexOf(x) === idx);
-
 export interface TreapNode<T> {
-  left: TreapNode<T> | null;
-  right: TreapNode<T> | null;
-  key: T;
+  readonly left: TreapNode<T> | null;
+  readonly right: TreapNode<T> | null;
+  readonly key: T;
+  readonly priority: number;
 }
 
-const construct = <T>(xs: T[]): TreapNode<T> | null => {
-  if (xs.length === 0) {
-    return null;
+const fst = <T, U>([x, _]: [T, U]) => x;
+const snd = <T, U>([_, x]: [T, U]) => x;
+
+const zip = <T, U>(xs: T[], ys: U[]): [T, U][] =>
+  xs.map((x, idx) => [x, ys[idx]]);
+const unzip = <T, U>(x: [T, U][]): [T[], U[]] => [x.map(fst), x.map(snd)];
+
+const add = <T>(
+  node: TreapNode<T> | null,
+  priority: number,
+  key: T
+): TreapNode<T> | null => {
+  if (node === null) {
+    return { left: null, right: null, key, priority };
   }
-  return { left: null, right: construct(xs.slice(1)), key: xs[0] };
+  if (key < node.key) {
+    return { ...node, left: add(node.left, priority, key) };
+  }
+  if (key > node.key) {
+    return { ...node, right: add(node.right, priority, key) };
+  }
+  return node;
+};
+
+const construct = <T>(randoms: number[], xs: T[]) => {
+  return xs.reduce<TreapNode<T> | null>(
+    (acc, x, idx) => add(acc, randoms[idx], x),
+    null
+  );
 };
 
 export class Treap<T> {
-  root: TreapNode<T> | null;
+  readonly root: TreapNode<T> | null;
+  readonly rng: Iterable<number>;
 
-  constructor(xs: T[]) {
-    this.root = construct(unique(xs).sort((x, y) => (x < y ? -1 : 1)));
+  constructor(rng: Iterable<number>, xs: T[]) {
+    const sorted = zip(Array.from(rng), xs).sort(([x, _a], [y, _b]) =>
+      x < y ? -1 : x === y ? 0 : 1
+    );
+    const [sortedRng, sortedXs] = unzip(sorted);
+    this.root = construct(sortedRng, sortedXs);
+    this.rng = rng;
+  }
+
+  private _find(node: TreapNode<T> | null, x: T): TreapNode<T> | null {
+    if (node === null) {
+      return null;
+    }
+    if (x < node.key) {
+      return this._find(node.left, x);
+    }
+    if (x > node.key) {
+      return this._find(node.right, x);
+    }
+    return node;
   }
 
   contains(x: T) {
-    const _contains = (node: TreapNode<T> | null): boolean => {
-      if (node === null) {
-        return false;
-      }
-      if (node.key === x) {
-        return true;
-      }
-      return _contains(node.right);
-    };
-    return _contains(this.root);
+    return this._find(this.root, x) !== null;
+  }
+
+  priority(x: T): number | null {
+    return this._find(this.root, x)?.priority ?? null;
   }
 }
